@@ -155,6 +155,12 @@ namespace Microsoft.Azure.Commands.Management.CognitiveServices
         [AllowEmptyCollection]
         public PSNetworkRuleSet NetworkRuleSet { get; set; }
 
+        [Parameter(
+            Mandatory = false,
+            HelpMessage = "The network access type for Cognitive Services Account. Commonly `Enabled` or `Disabled`.")]
+        [ValidateSet("Enabled", "Disabled", IgnoreCase = true)]
+        public string PublicNetworkAccess { get; set; }
+
         [Parameter(Mandatory = false, HelpMessage = "Don't ask for confirmation.")]
         public SwitchParameter Force { get; set; }
 
@@ -183,6 +189,11 @@ namespace Microsoft.Azure.Commands.Management.CognitiveServices
                     Tags = TagsConversionHelper.CreateTagDictionary(Tag),
                     Properties = properties
                 };
+
+                if (!string.IsNullOrEmpty(PublicNetworkAccess))
+                {
+                    createParameters.Properties.PublicNetworkAccess = PublicNetworkAccess;
+                }
 
                 if (AssignIdentity.IsPresent)
                 {
@@ -234,6 +245,24 @@ namespace Microsoft.Azure.Commands.Management.CognitiveServices
                             }
                         }
                     }
+
+                    if (Type.Equals("Face", StringComparison.InvariantCultureIgnoreCase) || Type.Equals("CognitiveServices", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        if (Force.IsPresent)
+                        {
+                            WriteWarning(Resources.NewAccount_LegalTerm_NotPolice);
+                        }
+                        else
+                        {
+                            bool yesToAll = false, noToAll = false;
+                            if (!ShouldContinue(Resources.NewAccount_LegalTerm_NotPolice, "Notice", true, ref yesToAll, ref noToAll))
+                            {
+                                return;
+                            }
+                        }
+                    }
+
+
                     try
                     {
                         CognitiveServicesAccount createAccountResponse = CognitiveServicesClient.Accounts.Create(

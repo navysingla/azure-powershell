@@ -18,6 +18,16 @@
         - Additional information about change #1
 -->
 ## Upcoming Release
+* Show additional legal terms for certain APIs.
+
+## Version 1.5.1
+* Used `Deny` specifically as NetworkRules default action.
+
+## Version 1.5.0
+* Supported displaying account capabilities.
+* Supported modifying PublicNetworkAccess.
+
+## Version 1.4.0
 * Support PrivateEndpoint and PublicNetworkAccess control. 
 
 ## Version 1.3.0
